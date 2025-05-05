@@ -3,11 +3,11 @@
 %
 %  Instructions
 %  ------------
-% 
-%  This file contains code that helps you get started on the
-%  linear regression exercise. 
 %
-%  You will need to complete the following functions in this 
+%  This file contains code that helps you get started on the
+%  linear regression exercise.
+%
+%  You will need to complete the following functions in this
 %  exericse:
 %
 %     warmUpExercise.m
@@ -48,25 +48,23 @@ pause;
 
 % Scale features and set them to zero mean
 fprintf('Normalizing Features ...\n');
-
 [X mu sigma] = featureNormalize(X);
 
 % Add intercept term to X
 X = [ones(m, 1) X];
-
 
 %% ================ Part 2: Gradient Descent ================
 
 % ====================== YOUR CODE HERE ======================
 % Instructions: We have provided you with the following starter
 %               code that runs gradient descent with a particular
-%               learning rate (alpha). 
+%               learning rate (alpha).
 %
-%               Your task is to first make sure that your functions - 
-%               computeCost and gradientDescent already work with 
+%               Your task is to first make sure that your functions -
+%               computeCost and gradientDescent already work with
 %               this starter code and support multiple variables.
 %
-%               After that, try running gradient descent with 
+%               After that, try running gradient descent with
 %               different values of alpha and see which one gives
 %               you the best result.
 %
@@ -79,33 +77,71 @@ X = [ones(m, 1) X];
 % Hint: At prediction, make sure you do the same feature normalization.
 %
 
-fprintf('Running gradient descent ...\n');
-
-% Choose some alpha value
-alpha = 0.01;
+% Number of iterations for gradient descent
 num_iters = 400;
 
-% Init Theta and Run Gradient Descent 
+% Init Theta
 theta = zeros(3, 1);
+
+% testing of the cost function
+fprintf('\nTesting the cost function ...\n')
+% compute and display initial cost
+J = computeCostMulti(X, y, theta);
+fprintf('With theta = [0 ; 0 ; 0]\nCost computed = %f\n', J);
+fprintf('Expected cost value (approx) 65591548106.46\n');
+
+% further testing of the cost function
+J = computeCostMulti(X, y, [3.3e5 ; 1e5 ; 3.6e3]);
+fprintf('\nWith theta = [330000 ; 100000 ; 36000]\nCost computed = %f\n', J);
+fprintf('Expected cost value (approx) 2144490040.42\n');
+
+fprintf('Program paused. Press enter to continue.\n');
+pause;
+
+fprintf('\nRunning gradient descent for different values of alpha...\n');
+
+% Setting test values for alpha
+alpha = [.3 .1 .03 .01 .003 .001];
+
+for i = 1:length(alpha)
+  fprintf('For alpha = %f\n', alpha(i));
+  theta = zeros(3, 1);
+  J_history = zeros(num_iters, 1);
+  [theta, J_history] = gradientDescentMulti(X, y, theta, alpha(i), num_iters);
+
+  % Display gradient descent's result
+  fprintf('Theta computed from gradient descent: \n');
+  fprintf(' %f \n', theta);
+  fprintf('\n');
+
+  % Plot the convergence graph
+  if (i == 1)
+    figure;
+    plot(1:numel(J_history), J_history, 'LineWidth', 1);
+    title('Learning Rate (alpha) tests')
+    xlabel('Number of iterations');
+    ylabel('Cost J');
+  else
+    hold on;
+    plot(1:numel(J_history), J_history, 'LineWidth', 1);
+  endif
+end
+legend(strsplit(num2str(alpha)))
+hold off;
+
+fprintf('\nRunning gradient descent for alpha = 0.3...\n');
+alpha = 0.3;
+theta = zeros(3, 1);
+J_history = zeros(num_iters, 1);
 [theta, J_history] = gradientDescentMulti(X, y, theta, alpha, num_iters);
-
-% Plot the convergence graph
-figure;
-plot(1:numel(J_history), J_history, '-b', 'LineWidth', 2);
-xlabel('Number of iterations');
-ylabel('Cost J');
-
-% Display gradient descent's result
-fprintf('Theta computed from gradient descent: \n');
-fprintf(' %f \n', theta);
-fprintf('\n');
 
 % Estimate the price of a 1650 sq-ft, 3 br house
 % ====================== YOUR CODE HERE ======================
 % Recall that the first column of X is all-ones. Thus, it does
 % not need to be normalized.
 price = 0; % You should change this
-
+new_house = ([1650 3] - mu) ./ sigma; % normalizing data
+price = [1 new_house]*theta;
 
 % ============================================================
 
@@ -117,15 +153,15 @@ pause;
 
 %% ================ Part 3: Normal Equations ================
 
-fprintf('Solving with normal equations...\n');
+fprintf('\nSolving with normal equations...\n');
 
 % ====================== YOUR CODE HERE ======================
-% Instructions: The following code computes the closed form 
+% Instructions: The following code computes the closed form
 %               solution for linear regression using the normal
-%               equations. You should complete the code in 
+%               equations. You should complete the code in
 %               normalEqn.m
 %
-%               After doing so, you should complete this code 
+%               After doing so, you should complete this code
 %               to predict the price of a 1650 sq-ft, 3 br house.
 %
 
@@ -150,7 +186,7 @@ fprintf('\n');
 % Estimate the price of a 1650 sq-ft, 3 br house
 % ====================== YOUR CODE HERE ======================
 price = 0; % You should change this
-
+price = [1 1650 3] * theta;
 
 % ============================================================
 

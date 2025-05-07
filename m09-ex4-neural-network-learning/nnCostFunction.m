@@ -62,23 +62,23 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+y_vectors = eye(num_labels);
 
+% feed forward
+a1 = sigmoid([ones(m, 1) X] * Theta1');
+h_THETA = sigmoid([ones(m, 1) a1] * Theta2');
 
+% cost
+J = sum(...
+        sum(...
+            log(h_THETA) .* y_vectors(:,y)' + ...
+            log(1 - h_THETA) .* (1 - y_vectors(:,y)')...
+            )...
+        ) / (-m);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+% cost regularization
+J = J + (lambda / (2 * m)) * ...
+            (sum(sum(Theta1(:,2:end) .^ 2)) + sum(sum(Theta2(:,2:end) .^ 2)));
 
 
 

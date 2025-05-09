@@ -65,14 +65,18 @@ Theta2_grad = zeros(size(Theta2));
 y_vectors = eye(num_labels);
 
 % feed forward
-a1 = sigmoid([ones(m, 1) X] * Theta1');
-h_THETA = sigmoid([ones(m, 1) a1] * Theta2');
+a1 = [ones(m, 1) X];
+z2 = a1 * Theta1';
+a2 = [ones(size(z2)(1), 1) sigmoid(z2)];
+z3 = a2 * Theta2';
+a3 = sigmoid(z3);
+h_Theta = a3;
 
 % cost
 J = sum(...
         sum(...
-            log(h_THETA) .* y_vectors(:,y)' + ...
-            log(1 - h_THETA) .* (1 - y_vectors(:,y)')...
+            log(h_Theta) .* y_vectors(:,y)' + ...
+            log(1 - h_Theta) .* (1 - y_vectors(:,y)')...
             )...
         ) / (-m);
 
@@ -81,12 +85,19 @@ J = J + (lambda / (2 * m)) * ...
             (sum(sum(Theta1(:,2:end) .^ 2)) + sum(sum(Theta2(:,2:end) .^ 2)));
 
 
+%%% Back Propagation %%%
+delta3 = a3 - y_vectors(:,y)';
+delta2 = (delta3 * Theta2(:,2:end)) .* sigmoidGradient(z2);
 
+Delta2 = delta3' * a2;
+Delta1 = delta2' * a1;
 
+Theta1_grad = (1/m) * Delta1;
+Theta2_grad = (1/m) * Delta2;
 
-
-
-
+% gradient regularization
+Theta1_grad = Theta1_grad + (lambda/m) * [zeros(size(Theta1)(1), 1) Theta1(:,2:end)];
+Theta2_grad = Theta2_grad + (lambda/m) * [zeros(size(Theta2)(1), 1) Theta2(:,2:end)];
 
 
 % -------------------------------------------------------------
